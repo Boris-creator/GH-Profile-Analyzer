@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option go_package = "/pb";
+
+package pb;
+
+enum EmploymentType {
+    WORK = 0;
+    OPENSOURCE = 1;
+    HOBBY = 2;
+}
+
+message OwnProfileRequest {
+    string token = 1;
+}
+
+message OwnProfileResponse {
+    float contributionsDispersion = 1;
+    EmploymentType type = 2;
+}
+
+service GHAnalysisService {
+    rpc OwnProfileInfo (OwnProfileRequest) returns (OwnProfileResponse) {}
+}

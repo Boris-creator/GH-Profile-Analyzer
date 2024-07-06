@@ -1,0 +1,63 @@
+query getViewer($from: DateTime, $to: DateTime) {
+  viewer {
+    MyName: name
+    createdAt
+    contributionsCollection(
+      from: $from
+      to: $to
+    ) {
+      contributionCalendar {
+        colors
+        totalContributions
+        weeks {
+          contributionDays {
+            color
+            contributionCount
+            date
+            weekday
+          }
+          firstDay
+        }
+      }
+    }
+    repositories(first: 100) {
+      nodes {
+        name
+        primaryLanguage {
+          name
+        }
+        languages(first: 100) {
+          edges {
+            node {
+              name
+            }
+            size
+          }
+        }
+        defaultBranchRef  {
+          name
+          target {
+            ... on Commit {
+              history(first: 100, author: {emails: "bk@quick-deal.ru"}, since: "2023-10-01T00:00:00Z") {
+                nodes {
+                  #message
+                  #committedDate
+                  oid
+
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+# getUser gets the given user's name from their username.
+query getUser($Login: String!) {
+  user(login: $Login) {
+    theirName: name
+    createdAt
+  }
+}

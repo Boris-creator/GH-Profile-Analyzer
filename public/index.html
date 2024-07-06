@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GH</title>
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+      }
+      button {
+        cursor: pointer;
+        text-transform: uppercase;
+        padding: .8em;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+        padding: 1em;
+      }
+      header,
+      main {
+        padding: 1em;
+        border: thin solid silver;
+      }
+      @media screen and (min-width: 1200px) {
+        header,
+        main {
+            width: 50vw;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a href="/login" target="_blank">Login with Github</a>
+      or use
+      <a href="/login1" target="_blank">this link</a>
+      if you want your private repositories to be analyzed too.
+    </header>
+    <main>
+      <button id="submit">Who am I?</button>
+    </main>
+    <script>
+      function request() {
+        const baseUrl = "http://localhost:1323";
+        const data = new FormData();
+        fetch(`${baseUrl}/analyze`, {
+          method: "POST",
+          body: data,
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("submit").addEventListener("click", request);
+      });
+    </script>
+  </body>
+</html>
