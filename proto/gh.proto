@@ -17,6 +17,7 @@ message OwnProfileRequest {
 message OwnProfileResponse {
     float contributionsDispersion = 1;
     EmploymentType type = 2;
+    repeated string languages = 3;
 }
 
 service GHAnalysisService {

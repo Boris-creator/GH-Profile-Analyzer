@@ -21,15 +21,44 @@ func (v *__getUserInput) GetLogin() string { return v.Login }
 
 // __getViewerInput is used internally by genqlient
 type __getViewerInput struct {
-	From time.Time `json:"from"`
-	To   time.Time `json:"to"`
+	Id      string    `json:"id"`
+	From    time.Time `json:"from"`
+	To      time.Time `json:"to"`
+	FromDay time.Time `json:"fromDay"`
 }
+
+// GetId returns __getViewerInput.Id, and is useful for accessing the field via an interface.
+func (v *__getViewerInput) GetId() string { return v.Id }
 
 // GetFrom returns __getViewerInput.From, and is useful for accessing the field via an interface.
 func (v *__getViewerInput) GetFrom() time.Time { return v.From }
 
 // GetTo returns __getViewerInput.To, and is useful for accessing the field via an interface.
 func (v *__getViewerInput) GetTo() time.Time { return v.To }
+
+// GetFromDay returns __getViewerInput.FromDay, and is useful for accessing the field via an interface.
+func (v *__getViewerInput) GetFromDay() time.Time { return v.FromDay }
+
+// getMyIdResponse is returned by getMyId on success.
+type getMyIdResponse struct {
+	// The currently authenticated user.
+	Viewer getMyIdViewerUser `json:"viewer"`
+}
+
+// GetViewer returns getMyIdResponse.Viewer, and is useful for accessing the field via an interface.
+func (v *getMyIdResponse) GetViewer() getMyIdViewerUser { return v.Viewer }
+
+// getMyIdViewerUser includes the requested fields of the GraphQL type User.
+// The GraphQL type's documentation follows.
+//
+// A user is an individual's account on GitHub that owns repositories and can make new content.
+type getMyIdViewerUser struct {
+	// The Node ID of the User object
+	Id string `json:"id"`
+}
+
+// GetId returns getMyIdViewerUser.Id, and is useful for accessing the field via an interface.
+func (v *getMyIdViewerUser) GetId() string { return v.Id }
 
 // getUserResponse is returned by getUser on success.
 type getUserResponse struct {
@@ -73,6 +102,8 @@ func (v *getViewerResponse) GetViewer() getViewerViewerUser { return v.Viewer }
 type getViewerViewerUser struct {
 	// The user's public profile name.
 	MyName string `json:"MyName"`
+	// The username used to login.
+	Login string `json:"login"`
 	// Identifies the date and time when the object was created.
 	CreatedAt time.Time `json:"createdAt"`
 	// The collection of contributions this user has made to different repositories.
@@ -83,6 +114,9 @@ type getViewerViewerUser struct {
 
 // GetMyName returns getViewerViewerUser.MyName, and is useful for accessing the field via an interface.
 func (v *getViewerViewerUser) GetMyName() string { return v.MyName }
+
+// GetLogin returns getViewerViewerUser.Login, and is useful for accessing the field via an interface.
+func (v *getViewerViewerUser) GetLogin() string { return v.Login }
 
 // GetCreatedAt returns getViewerViewerUser.CreatedAt, and is useful for accessing the field via an interface.
 func (v *getViewerViewerUser) GetCreatedAt() time.Time { return v.CreatedAt }
@@ -584,6 +618,38 @@ func (v *getViewerViewerUserRepositoriesRepositoryConnectionNodesRepositoryPrima
 	return v.Name
 }
 
+// The query or mutation executed by getMyId.
+const getMyId_Operation = `
+query getMyId {
+	viewer {
+		id
+	}
+}
+`
+
+// getUser gets my user node id.
+func getMyId(
+	ctx_ context.Context,
+	client_ graphql.Client,
+) (*getMyIdResponse, error) {
+	req_ := &graphql.Request{
+		OpName: "getMyId",
+		Query:  getMyId_Operation,
+	}
+	var err_ error
+
+	var data_ getMyIdResponse
+	resp_ := &graphql.Response{Data: &data_}
+
+	err_ = client_.MakeRequest(
+		ctx_,
+		req_,
+		resp_,
+	)
+
+	return &data_, err_
+}
+
 // The query or mutation executed by getUser.
 const getUser_Operation = `
 query getUser ($Login: String!) {
@@ -623,9 +689,10 @@ func getUser(
 
 // The query or mutation executed by getViewer.
 const getViewer_Operation = `
-query getViewer ($from: DateTime, $to: DateTime) {
+query getViewer ($id: ID, $from: DateTime, $to: DateTime, $fromDay: GitTimestamp) {
 	viewer {
 		MyName: name
+		login
 		createdAt
 		contributionsCollection(from: $from, to: $to) {
 			contributionCalendar {
@@ -661,7 +728,7 @@ query getViewer ($from: DateTime, $to: DateTime) {
 					target {
 						__typename
 						... on Commit {
-							history(first: 100, author: {emails:"bk@quick-deal.ru"}, since: "2023-10-01T00:00:00Z") {
+							history(first: 100, author: {id:$id}, since: $fromDay) {
 								nodes {
 									oid
 								}
@@ -675,18 +742,23 @@ query getViewer ($from: DateTime, $to: DateTime) {
 }
 `
 
+// get my profile data
 func getViewer(
 	ctx_ context.Context,
 	client_ graphql.Client,
+	id string,
 	from time.Time,
 	to time.Time,
+	fromDay time.Time,
 ) (*getViewerResponse, error) {
 	req_ := &graphql.Request{
 		OpName: "getViewer",
 		Query:  getViewer_Operation,
 		Variables: &__getViewerInput{
-			From: from,
-			To:   to,
+			Id:      id,
+			From:    from,
+			To:      to,
+			FromDay: fromDay,
 		},
 	}
 	var err_ error

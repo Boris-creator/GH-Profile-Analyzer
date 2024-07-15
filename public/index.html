@@ -47,10 +47,8 @@
     <script>
       function request() {
         const baseUrl = "http://localhost:1323";
-        const data = new FormData();
         fetch(`${baseUrl}/analyze`, {
           method: "POST",
-          body: data,
         });
       }
 

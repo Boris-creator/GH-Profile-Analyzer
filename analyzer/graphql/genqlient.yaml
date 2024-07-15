@@ -1,7 +1,7 @@
 schema: schema.docs.graphql
 operations:
 - genqlient.graphql
-generated: generated.go
+generated: ../viewer.go
 
 # We bind github's DateTime scalar type to Go's time.Time (which conveniently
 # already defines MarshalJSON and UnmarshalJSON).  This means genqlient will
@@ -9,6 +9,8 @@ generated: generated.go
 # scalars.
 bindings:
   DateTime:
+    type: time.Time
+  GitTimestamp:
     type: time.Time
   Date:
     type: string

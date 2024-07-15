@@ -32,6 +32,7 @@ func fromOwnProfileInfo(info analyzer.OwnProfileInfo) pb.OwnProfileResponse {
 	return pb.OwnProfileResponse{
 		ContributionsDispersion: float32(info.ContributionsDispersion),
 		Type:                    developerType,
+		Languages:               info.Languages,
 	}
 }
 

@@ -23,6 +23,7 @@ func fromServiceResponse(r pb.OwnProfileResponse) resources.OwnProfileInfo {
 	return resources.OwnProfileInfo{
 		ContributionsDispersion: r.ContributionsDispersion,
 		Type:                    types[r.Type],
+		Languages:               r.Languages,
 	}
 }
 

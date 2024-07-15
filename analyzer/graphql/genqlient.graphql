@@ -1,6 +1,8 @@
-query getViewer($from: DateTime, $to: DateTime) {
+#get my profile data
+query getViewer($id: ID, $from: DateTime, $to: DateTime, $fromDay: GitTimestamp) {
   viewer {
     MyName: name
+    login
     createdAt
     contributionsCollection(
       from: $from
@@ -38,12 +40,11 @@ query getViewer($from: DateTime, $to: DateTime) {
           name
           target {
             ... on Commit {
-              history(first: 100, author: {emails: "bk@quick-deal.ru"}, since: "2023-10-01T00:00:00Z") {
+              history(first: 100, author: {id: $id}, since: $fromDay) {
                 nodes {
                   #message
                   #committedDate
                   oid
-
                 }
               }
             }
@@ -51,6 +52,13 @@ query getViewer($from: DateTime, $to: DateTime) {
         }
       }
     }
+  }
+}
+
+# getUser gets my user node id.
+query getMyId() {
+  viewer {
+    id
   }
 }
 
